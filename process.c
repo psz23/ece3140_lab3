@@ -2,8 +2,15 @@
 #include <stdlib.h>
 #include <fsl_device_registers.h>
 
-/* current process is NULL before scheduler starts and after it end */
+/* PCB process control block */
+struct process_state {
+	unsigned int *sp;
+	int size;
+	struct process_state *next_process;
+	/* the stack pointer for the process */
+};
 
+/* current process is NULL before scheduler starts and after it end */
 process_t * current_process = NULL;
 
 
@@ -16,20 +23,19 @@ Should allocate a process_t
 Should add the process to your scheduler's data structures */
 int process_create (void (*f) (void), int n)
 {
-	
-}
+	unsigned int *sp = process_stack_init((*f), n);
+	if (*sp == NULL) return -1;
+	process_t *process = malloc(sizeof(process_t));
+	process->sp = sp;
+	process->size = n;
+	return 0;
+};
 
 
 
 void process_start (void);
 
 
-
-/* PCB process control block */
-struct process_state {
-	unsigned int *sp;
-	/* the stack pointer for the process */
-};
 
 /* updates process_t*/
 unsigned int * process_select(unsigned int * cursp);
