@@ -33,7 +33,13 @@ int process_create (void (*f) (void), int n)
 
 
 
-void process_start (void);
+void process_start (void)
+{
+	
+	NVIC_EnableIRQ(PIT0_IRQn);
+	
+	process_begin();
+}
 
 
 
