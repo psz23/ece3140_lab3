@@ -27,8 +27,8 @@ void process_start (void);
 
 /* PCB process control block */
 struct process_state {
-	int var1;
-	struct process_state* some_pointer;
+	unsigned int *sp;
+	/* the stack pointer for the process */
 };
 
 /* updates process_t*/
