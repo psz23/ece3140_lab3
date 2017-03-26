@@ -38,8 +38,6 @@ int process_create (void (*f) (void), int n)
 	return 0;
 };
 
-
-
 void process_start (void)
 {
 	PIT->MCR = 0;
