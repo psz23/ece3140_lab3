@@ -13,7 +13,7 @@ struct process_state {
 /* current process is NULL before scheduler starts and after it end */
 process_t * current_process = NULL;
 
-
+/* make/update process queue? linked list */
 
 /* Creates a new process that starts at function f, initial stack size n 
 Returns 0 on success, -1 if error 
@@ -35,14 +35,19 @@ int process_create (void (*f) (void), int n)
 
 void process_start (void)
 {
-	
 	NVIC_EnableIRQ(PIT0_IRQn);
 	
 	process_begin();
 }
 
+/* process_t is NULL until process_start is called
+also NULL when a process terminates */
+
+/* Use process_stack_free when a process terminates */
 
 
 /* updates process_t*/
-unsigned int * process_select(unsigned int * cursp);
+unsigned int * process_select(unsigned int * cursp){
+	// help i'm die
+}
 
