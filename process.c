@@ -15,11 +15,11 @@ process_t * current_process = NULL;
 
 /* make/update process queue? linked list */
 struct process_queue {
-	process_state *val;
+	struct process_state *val;
 	struct process_queue *next;
 };
 
-struct proces_queue *process_one = NULL;
+struct process_queue *process_one = NULL;
 
 
 /* Creates a new process that starts at function f, initial stack size n 
@@ -41,7 +41,7 @@ int process_create (void (*f) (void), int n)
 		process_one = new_process;
 		new_process->next = NULL;
 	} else {
-		tmp = process_one;
+		struct process_queue *tmp = process_one;
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
