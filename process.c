@@ -15,7 +15,7 @@ process_t * current_process = NULL;
 
 /* make/update process queue? linked list */
 struct process_queue {
-	int val;
+	process_state *val;
 	struct process_queue *next;
 };
 
@@ -35,6 +35,19 @@ int process_create (void (*f) (void), int n)
 	process_t *process = malloc(sizeof(process_t));
 	process->sp = sp;
 	process->size = n;
+	struct process_queue *new_process;
+	new_process->val = process;
+	if (process_one == NULL) {
+		process_one = new_process;
+		new_process->next = NULL;
+	} else {
+		tmp = process_one;
+		while (tmp->next != NULL) {
+			tmp = tmp->next;
+		}
+		tmp->next = new_process;
+		new_process->next = NULL;
+	}
 	return 0;
 };
 
