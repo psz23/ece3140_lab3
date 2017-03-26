@@ -48,6 +48,8 @@ also NULL when a process terminates */
 
 /* updates process_t*/
 unsigned int * process_select(unsigned int * cursp){
-	// help i'm die
+	/* help i'm die
+	what do we even do
+	*/
 }
 
