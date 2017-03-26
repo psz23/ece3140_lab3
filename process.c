@@ -14,6 +14,13 @@ struct process_state {
 process_t * current_process = NULL;
 
 /* make/update process queue? linked list */
+struct process_queue {
+	int val;
+	struct process_queue *next;
+};
+
+struct proces_queue *process_one = NULL;
+
 
 /* Creates a new process that starts at function f, initial stack size n 
 Returns 0 on success, -1 if error 
@@ -35,6 +42,8 @@ int process_create (void (*f) (void), int n)
 
 void process_start (void)
 {
+	PIT->MCR = 0;
+	PIT->CHANNEL[0].LDVAL = 0x1E8480;
 	NVIC_EnableIRQ(PIT0_IRQn);
 	
 	process_begin();
