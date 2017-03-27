@@ -21,6 +21,27 @@ struct process_queue {
 
 struct process_queue *process_one = NULL;
 
+void add_to_queue (struct process_queue *new_process) 
+{
+	if (process_one == NULL) {
+		process_one = new_process;
+		new_process->next = NULL;
+	} 
+	else {
+		struct process_queue *tmp = process_one;
+		while (tmp->next != NULL) {
+			tmp = tmp->next;
+		}
+		tmp->val->next_process = new_process->val;
+		tmp->next = new_process;
+		new_process->next = NULL;
+	}
+};
+
+void remove_from_queue (void) {
+	process_one = process_one->next;
+};
+
 
 /* Creates a new process that starts at function f, initial stack size n 
 Returns 0 on success, -1 if error 
@@ -38,19 +59,7 @@ int process_create (void (*f) (void), int n)
 	process->next_process = NULL;
 	struct process_queue *new_process;
 	new_process->val = process;
-	if (process_one == NULL) {
-		process_one = new_process;
-		new_process->next = NULL;
-	} 
-	else {
-		struct process_queue *tmp = process_one;
-		while (tmp->next != NULL) {
-			tmp = tmp->next;
-		}
-		tmp->val->next_process = new_process->val;
-		tmp->next = new_process;
-		new_process->next = NULL;
-	}
+	add_to_queue(new_process);
 	return 0;
 };
 
@@ -81,7 +90,19 @@ unsigned int * process_select(unsigned int * cursp)
 			}
 		}
 		else { //just finished process
-			if (curr
+			struct process_state *tmp = current_process;
+			current_process = current_process->next_process;
+			process_stack_free(tmp->sp, tmp->size);
+			remove_from_queue();
+			return current_process->sp;
+		}
+	}
+	else {
+		struct process_queue *tmp = process_one;
+		add_to_queue(process_one);
+		remove_from_queue();
+		return process_one->val->sp;
+	}
 			
 }
 
