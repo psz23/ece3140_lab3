@@ -19,27 +19,33 @@ struct process_queue {
 	struct process_queue *next;
 };
 
-struct process_queue *process_one = NULL;
+struct process_queue *process_one = NULL; // initialize queue's global variable keeping track of first process in queue
 
 void add_to_queue (struct process_queue *new_process) 
 {
+	// list is empty, add to beginning
 	if (process_one == NULL) {
 		process_one = new_process;
 		new_process->next = NULL;
 	} 
+	// list is not empty, add to end
 	else {
 		struct process_queue *tmp = process_one;
+		// traverse the list to the end
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
+		// add new_process as the next of the current last
 		tmp->val->next_process = new_process->val;
 		tmp->next = new_process;
 		new_process->next = NULL;
 	}
 };
 
+/* Remove first element from queue; we only ever remove first element of list
+When first element is only element, next is null. Therefore, the first element is null */
 void remove_from_queue (void) {
-	process_one = process_one->next;
+	if (process_one != NULL) process_one = process_one->next;
 };
 
 
@@ -63,44 +69,69 @@ int process_create (void (*f) (void), int n)
 	return 0;
 };
 
+/* Start process with the given amount of time
+*/
 void process_start (void)
 {
 	PIT->MCR = 0;
-	PIT->CHANNEL[0].LDVAL = 0x1E8480;
+	PIT->CHANNEL[0].LDVAL = 0x1E8480; // ~10 Hz, load 2 million cycles
 	NVIC_EnableIRQ(PIT0_IRQn);
 	current_process = process_one->val;
 	process_begin();
 }
 
-/* process_t is NULL until process_start is called
-also NULL when a process terminates */
-
-/* Use process_stack_free when a process terminates */
 
 
-/* updates process_t*/
+/* updates process_t
+process_t is NULL until process_start is called
+process_t is also NULL when a process terminates
+current_process is process_t
+cursp is null if no process is running or when process just finished */
 unsigned int * process_select(unsigned int * cursp)
 {
-	if (cursp == NULL) { //if cursp is null, process is finished or nothing was running
-		if (current_process == NULL) { //nothing was running
+	if (cursp == NULL) {
+		// remove first process in queue if it exists
+		// free the stack memory
+		// save process in a temp variable
+		struct process_state *tmp = current_process;
+		// free the stack for the previous process and remove from the queue
+		process_stack_free(tmp->sp, tmp->size);
+		remove_from_queue();
+		// update current_process; null if queue is empty
+		current_process = process_one->val;
+		return current_process->sp;
+		
+		/*
+		// nothing was running
+		if (current_process == NULL) {
+			// queue is empty, return null
 			if (process_one == NULL) return NULL;
+			// queue is not empty, return the first process of the queue's SP
 			else{
 				current_process = process_one->val;
 				return current_process->sp;
 			}
 		}
-		else { //just finished process
+		// just finished process
+		else {
+			// save process in a temp variable
 			struct process_state *tmp = current_process;
+			// update current_process
 			current_process = current_process->next_process;
+			// free the stack for the previous process and remove from the queue
 			process_stack_free(tmp->sp, tmp->size);
 			remove_from_queue();
 			return current_process->sp;
 		}
+		*/
 	}
+	// process was not done
 	else {
 		struct process_queue *tmp = process_one;
+		// kick current process to the back of the queue and remove from the beginning
 		add_to_queue(process_one);
 		remove_from_queue();
+		// the current process is now what is first in the queue
 		return process_one->val->sp;
 	}
 			
