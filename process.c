@@ -49,7 +49,7 @@ void process_start (void)
 {
 	SIM->SCGC6 = SIM_SCGC6_PIT_MASK;
 	PIT_MCR &= 0;
-	PIT->CHANNEL[0].LDVAL = 0xFFFFFF; // ~10 Hz, load 2 million cycles
+	PIT->CHANNEL[0].LDVAL = 0x989680; // load 10 million cycles
 	PIT->CHANNEL[0].TFLG |= 1;
 	NVIC_EnableIRQ(PIT0_IRQn);
 	process_begin();

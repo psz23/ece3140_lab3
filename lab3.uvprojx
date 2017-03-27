@@ -395,11 +395,6 @@
               <FilePath>.\3140_concur.h</FilePath>
             </File>
             <File>
-              <FileName>lab3_t0.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\lab3_t0.c</FilePath>
-            </File>
-            <File>
               <FileName>utils.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\utils.c</FilePath>
