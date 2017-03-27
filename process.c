@@ -35,16 +35,19 @@ int process_create (void (*f) (void), int n)
 	process_t *process = malloc(sizeof(process_t));
 	process->sp = sp;
 	process->size = n;
+	process->next_process = NULL;
 	struct process_queue *new_process;
 	new_process->val = process;
 	if (process_one == NULL) {
 		process_one = new_process;
 		new_process->next = NULL;
-	} else {
+	} 
+	else {
 		struct process_queue *tmp = process_one;
 		while (tmp->next != NULL) {
 			tmp = tmp->next;
 		}
+		tmp->val->next_process = new_process->val;
 		tmp->next = new_process;
 		new_process->next = NULL;
 	}
@@ -56,7 +59,7 @@ void process_start (void)
 	PIT->MCR = 0;
 	PIT->CHANNEL[0].LDVAL = 0x1E8480;
 	NVIC_EnableIRQ(PIT0_IRQn);
-	
+	current_process = process_one->val;
 	process_begin();
 }
 
@@ -67,9 +70,18 @@ also NULL when a process terminates */
 
 
 /* updates process_t*/
-unsigned int * process_select(unsigned int * cursp){
-	/* help i'm die
-	what do we even do
-	*/
+unsigned int * process_select(unsigned int * cursp)
+{
+	if (cursp == NULL) { //if cursp is null, process is finished or nothing was running
+		if (current_process == NULL) { //nothing was running
+			if (process_one == NULL) return NULL;
+			else{
+				current_process = process_one->val;
+				return current_process->sp;
+			}
+		}
+		else { //just finished process
+			if (curr
+			
 }
 
