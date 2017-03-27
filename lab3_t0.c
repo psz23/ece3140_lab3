@@ -20,7 +20,7 @@ void p2 (void)
 }
 
 int main (void)
-{
+ {
  LED_Initialize();
  
  if (process_create (p1,20) < 0) {
