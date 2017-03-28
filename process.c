@@ -3,11 +3,11 @@
 #include <fsl_device_registers.h>
 
 /* PCB process control block */
-typedef struct process_state {
+struct process_state {
 	unsigned int *sp;
 	struct process_state *next;
 	/* the stack pointer for the process */
-} process_t;
+};
 
 /* current process is NULL before scheduler starts and after it end */
 process_t * current_process = NULL;
@@ -49,7 +49,7 @@ void process_start (void)
 {
 	SIM->SCGC6 = SIM_SCGC6_PIT_MASK;
 	PIT_MCR &= 0;
-	PIT->CHANNEL[0].LDVAL = 0x989680; // load 10 million cycles
+	PIT->CHANNEL[0].LDVAL = 0x1E8480; // load 2 million cycles (somewhere close to 10 Hz, >10 Hz)
 	PIT->CHANNEL[0].TFLG |= 1;
 	NVIC_EnableIRQ(PIT0_IRQn);
 	process_begin();
@@ -97,36 +97,12 @@ unsigned int * process_select(unsigned int * cursp)
 		free(tmp);
 		// update current_process; null if queue is empty
 		return current_process->sp;
-		
-		/*
-		// nothing was running
-		if (current_process == NULL) {
-			// queue is empty, return null
-			if (process_one == NULL) return NULL;
-			// queue is not empty, return the first process of the queue's SP
-			else{
-				current_process = process_one->val;
-				return current_process->sp;
-			}
-		}
-		// just finished process
-		else {
-			// save process in a temp variable
-			struct process_state *tmp = current_process;
-			// update current_process
-			current_process = current_process->next_process;
-			// free the stack for the previous process and remove from the queue
-			process_stack_free(tmp->sp, tmp->size);
-			remove_from_queue();
-			return current_process->sp;
-		}
-		*/
 	}
 	// process was not done
 	else {
 		// kick current process to the back of the queue and remove from the beginning
 		current_process->sp = cursp;
-		//current_process->next = NULL;
+		// current_process->next = NULL;
 		add_to_queue(current_process);
 		current_process = remove_from_queue();
 		// the current process is now what is first in the queue
